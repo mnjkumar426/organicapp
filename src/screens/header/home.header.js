@@ -1,37 +1,41 @@
 import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { SECONDARY_COLOUR, SECONDARY_BG, PRIMARY_BG } from '../styles/colors';
+import { SECONDARY_COLOUR, SECONDARY_BG, PRIMARY_BG, LIGHT_COLOUR, IOCN_COLOR } from '../../styles/colors';
 import { TextInput, ScrollView } from 'react-native-gesture-handler';
-import { ICON_SIZE } from '../styles/size';
-import { Searchbar } from 'react-native-paper';
-import { NAVIGATION } from '../constants/navigation';
+import { ICON_SIZE } from '../../styles/size';
+import { NAVIGATION } from '../../constants/navigation';
 import { useNavigation } from '@react-navigation/native';
+import { SearchInput } from './search.header';
+import { useSelector } from 'react-redux';
 const   Header=()=> {
   const navigation=useNavigation();
   const [searchQuery, setSearchQuery] = React.useState('');
+  const {auth}=useSelector(state=>state)
 
   const onChangeSearch = query => setSearchQuery(query);
   return (
    
     <View style={styles.header}>
       <View style={styles.top}>
-        <Icon name="bars" onPress={() => navigation.openDrawer()}style={{ fontSize: ICON_SIZE, color: SECONDARY_COLOUR }}></Icon>
+        <Icon name="bars" onPress={() => navigation.openDrawer()}style={{ fontSize: ICON_SIZE, color: IOCN_COLOR }}></Icon>
         <Text>LoGO</Text>
-        <Icon name="user" style={{ fontSize: ICON_SIZE, color: SECONDARY_COLOUR, alignItems: "flex-end" }}></Icon>
+        <Icon name="user" 
+        onPress={()=>{
+          auth.isLogin?navigation.navigate({name:NAVIGATION.MYACCOUNT})
+          : navigation.navigate({name:NAVIGATION.LOGIN})
+         
+        }}
+        style={{ fontSize: ICON_SIZE, color: IOCN_COLOR, alignItems: "flex-end" }}></Icon>
       </View>
 
-      <View style={styles.searchBox}>
-        {/* <Icon name="search" style={{ fontSize: ICON_SIZE, color: SECONDARY_COLOUR }}></Icon>
-        <TextInput placeholder="Search for Produts" style={styles.search}></TextInput> */}
-      <Searchbar
-        placeholder="Search"
-      onChangeText={onChangeSearch}
-      onFocus={()=>{navigation.navigate(NAVIGATION.SEARCH)}}
-      style={{backgroundColor:SECONDARY_COLOUR,borderRadius:30}}
-      value={searchQuery}
-    />
-      </View>
+      <SearchInput
+      onFocus={()=>{
+        navigation.navigate({name:NAVIGATION.SEARCH})
+      }}
+      hideAction={true}
+      hideClear={true}
+      ></SearchInput>
 
     </View>
 

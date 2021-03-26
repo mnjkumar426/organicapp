@@ -14,29 +14,32 @@ import LinearGradient from 'react-native-linear-gradient';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import Feather from 'react-native-vector-icons/Feather';
 
-import { useTheme } from 'react-native-paper';
-import {login} from '../redux/actions/auth.action'
 
-import Users from '../model/users';
+import {login,sendOtp} from '../../redux/actions/auth.action'
+
+import Users from '../../model/users';
 import { useDispatch } from 'react-redux';
+import { useTheme } from '@react-navigation/native';
 
 const SignInScreen = ({navigation}) => {
 
     const [data, setData] = React.useState({
         username: '',
-        password: '',
+    
         check_textInputChange: false,
         secureTextEntry: true,
-        isValidUser: true,
-        isValidPassword: true,
+        isValidUser: false,
+        
     });
 
     const { colors } = useTheme();
     const dispatch = useDispatch()
+    const isMobile=true;
     
 
     const textInputChange = (val) => {
-        if( val.trim().length >= 4 ) {
+
+        if( val.trim().length == 10 ) {
             setData({
                 ...data,
                 username: val,
@@ -90,34 +93,85 @@ const SignInScreen = ({navigation}) => {
         }
     }
 
-    const loginHandle = (userName, password) => {
-
-        const foundUser = Users.filter( item => {
-            return userName == item.username && password == item.password;
-        } );
-
-        if ( data.username.length == 0 || data.password.length == 0 ) {
-            Alert.alert('Wrong Input!', 'Username or password field cannot be empty.', [
-                {text: 'Okay'}
-            ]);
-            return;
-        }
-
-        if ( foundUser.length == 0 ) {
-            Alert.alert('Invalid User!', 'Username or password is incorrect.', [
-                {text: 'Okay'}
-            ]);
-            return;
-        }
-        dispatch(login({userName,password}));
+    const loginHandle = async(mobile) => {
+            try {
+                let data=await sendOtp(mobile);
+                console.log("data",data)
+            } catch (error) {
+                
+            }
+       
+       
     }
 
     return (
+        
+
       <View style={styles.container}>
           <StatusBar backgroundColor='#009387' barStyle="light-content"/>
         <View style={styles.header}>
             <Text style={styles.text_header}>Welcome!</Text>
         </View>
+            {
+                isMobile?
+
+
+                <Animatable.View 
+            animation="fadeInUpBig"
+            style={[styles.footer, {
+                backgroundColor: colors.background
+            }]}
+        >
+            <Text style={[styles.text_footer, {
+                color: colors.text,
+                textAlign:'center'
+            }]}>Enter Mobile Number</Text>
+            <View style={styles.action}>
+                
+                <TextInput 
+                    placeholder="Mobile Number (10 digit)"
+                    placeholderTextColor="#666666"
+                    style={[styles.textInput, {
+                        color: colors.text
+                    }]}
+                    autoCapitalize="none"
+                    onChangeText={(val) => textInputChange(val)}
+                    onEndEditing={(e)=>handleValidUser(e.nativeEvent.text)}
+                />
+                
+            </View>
+            {/* { data.isValidUser ? null : 
+            <Animatable.View animation="fadeInLeft" duration={500}>
+            <Text style={styles.errorMsg}></Text>
+            </Animatable.View>
+            
+            } */}
+            
+            <TouchableOpacity
+            disabled={!data.isValidUser}
+                    style={{
+                        ...styles.signIn,
+                        
+                    }
+                    }
+                    onPress={() => {loginHandle( data.username )}}
+                >
+                <LinearGradient
+                    colors={['#08d4c4', '#01ab9d']}
+                    style={styles.signIn}
+                >
+                    <Text style={[styles.textSign, {
+                        color:'#fff',
+                        opacity:data.isValidUser?1:.5
+                    }]}>Continue </Text>
+                </LinearGradient>
+                </TouchableOpacity>
+            
+        </Animatable.View>
+
+
+                :
+
         <Animatable.View 
             animation="fadeInUpBig"
             style={[styles.footer, {
@@ -141,7 +195,7 @@ const SignInScreen = ({navigation}) => {
                     }]}
                     autoCapitalize="none"
                     onChangeText={(val) => textInputChange(val)}
-                    onEndEditing={(e)=>handleValidUser(e.nativeEvent.text)}
+                    //onEndEditing={(e)=>handleValidUser(e.nativeEvent.text)}
                 />
                 {data.check_textInputChange ? 
                 <Animatable.View
@@ -157,7 +211,9 @@ const SignInScreen = ({navigation}) => {
             </View>
             { data.isValidUser ? null : 
             <Animatable.View animation="fadeInLeft" duration={500}>
-            <Text style={styles.errorMsg}>Username must be 4 characters long.</Text>
+            <Text style={styles.errorMsg}>Invalid Mobile.</Text>
+
+            
             </Animatable.View>
             }
             
@@ -239,6 +295,7 @@ const SignInScreen = ({navigation}) => {
                 </TouchableOpacity>
             </View>
         </Animatable.View>
+}
       </View>
     );
 };
@@ -251,18 +308,22 @@ const styles = StyleSheet.create({
       backgroundColor: '#009387'
     },
     header: {
-        flex: 1,
+        flex: 2,
         justifyContent: 'flex-end',
         paddingHorizontal: 20,
         paddingBottom: 50
     },
     footer: {
-        flex: 3,
+        flex: 1,
+        //alignContent:'center',
+        //justifyContent:'center',
         backgroundColor: '#fff',
-        borderTopLeftRadius: 30,
-        borderTopRightRadius: 30,
+        borderTopLeftRadius: 5,
+        borderTopRightRadius: 5,
         paddingHorizontal: 20,
-        paddingVertical: 30
+        paddingVertical: 30,
+        marginLeft:20,
+        marginRight:20
     },
     text_header: {
         color: '#fff',
@@ -292,6 +353,8 @@ const styles = StyleSheet.create({
         marginTop: Platform.OS === 'ios' ? 0 : -12,
         paddingLeft: 10,
         color: '#05375a',
+        borderBottomColor:'#ddd',
+        borderBottomWidth:1
     },
     errorMsg: {
         color: '#FF0000',
@@ -302,14 +365,18 @@ const styles = StyleSheet.create({
         marginTop: 50
     },
     signIn: {
-        width: '100%',
-        height: 50,
+      
+       
         justifyContent: 'center',
         alignItems: 'center',
-        borderRadius: 10
-    },
+        borderRadius: 20,
+        padding:40,
+        paddingTop:10,
+        paddingBottom:10,
+        marginTop:20
+        },
     textSign: {
-        fontSize: 18,
-        fontWeight: 'bold'
+        fontSize: 16,
+        fontWeight: 'normal'
     }
   });

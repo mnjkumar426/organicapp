@@ -9,35 +9,48 @@ import {
   
 } from 'react-native';
 
-import {SLIDERS} from '../../constants/constant'
+import {IMAGE_BASE_URL, SLIDERS} from '../../constants/constant'
+import { useSelector } from 'react-redux';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import { useNavigation } from '@react-navigation/native';
+import { NAVIGATION } from '../../constants/navigation';
 
 const {width: screenWidth} = Dimensions.get('window');
 
-export const HomeSlider = props => {
-  const [entries, setEntries] = useState([]);
+export const HomeSlider = ({banners}) => {
   const carouselRef = useRef(null);
+  //const {banners}=useSelector(state=>state.home)
+  const navigation=useNavigation();
+ 
 
   const goForward = () => {
     carouselRef.current.snapToNext();
   };
 
   useEffect(() => {
-    setEntries(SLIDERS);
+    //setEntries(SLIDERS);
   }, []);
 
   const renderItem = ({item, index}, parallaxProps) => {
-    // console.log(item)
+    
+    let imageUrl=item?.image?.path;
+    //console.log(JSON.stringify(imageUrl))
+     
     return (
-        <View style={styles.item}>
+        <TouchableOpacity style={styles.item} onPress={()=>{
+          navigation.navigate({name:NAVIGATION.PRODUCT_SCREEN,params:item});
+        }}>
+          
           <ParallaxImage
-            source={item.name}
+            source={{uri:imageUrl}}
             containerStyle={styles.imageContainer}
             style={styles.image}
             parallaxFactor={0.1}
             {...parallaxProps}
+            
           />
          
-        </View>
+        </TouchableOpacity>
       );
     };
   
@@ -50,7 +63,7 @@ export const HomeSlider = props => {
           sliderWidth={screenWidth}
           sliderHeight={screenWidth}
           itemWidth={screenWidth - 60}
-          data={entries}
+          data={banners}
           renderItem={renderItem}
           hasParallaxImages={true}
           horizontal={true}
@@ -83,7 +96,7 @@ export const HomeSlider = props => {
     },
     image: {
       ...StyleSheet.absoluteFillObject,
-      resizeMode: 'cover',
+      resizeMode: 'stretch',
     },
     
      

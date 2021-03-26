@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { 
     View, 
     Text, 
@@ -9,51 +9,74 @@ import {
     Image
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import LinearGradient from 'react-native-linear-gradient';
-import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-import { useTheme } from '@react-navigation/native';
+import { useNavigation, useTheme } from '@react-navigation/native';
+import { ActivityIndicator } from 'react-native';
+import { useDispatch, useSelector } from 'react-redux';
+import { NAVIGATION } from '../constants/navigation';
+import { AsyncStorage } from 'react-native';
+import { INITIALSTATE } from '../constants/constant';
+import { Initialstate } from '../constants/initialstate';
+import { setinitialState } from '../redux/reducers/auth.reducer';
+import { get_cart } from '../redux/actions/cart.action';
 
 const SplashScreen = ({navigation}) => {
     const { colors } = useTheme();
+    const dispatch=useDispatch();
+   
+    useEffect(()=>
+    {
+
+        const intiApp= async()=>{
+            let initState=await AsyncStorage.getItem(INITIALSTATE);
+            if(!initState){
+              await AsyncStorage.setItem(INITIALSTATE,JSON.stringify(Initialstate));
+            }
+            let init=await AsyncStorage.getItem(INITIALSTATE)
+            init=JSON.parse(init);
+            console.log("init",init)
+            let defaultLocation=(init && init.user && init.user.locationId)?
+            init.user.locationId:init.defaultLocation;
+            init.defaultLocation=defaultLocation;
+            dispatch(setinitialState(init));
+            if(init && init.user && init.user.token){
+               // dispatch(get_cart());
+            }
+          
+
+            setTimeout(() => {
+                if(init.defaultLocation){
+                    navigation.navigate({name:NAVIGATION.HomeDrawer})
+                 }else{
+                     navigation.navigate({name:NAVIGATION.LOCATION})
+                 }
+            }, 2000);
+
+        
+          }
+           
+     intiApp()
+       
+       
+        
+    }
+    ,[])
+   
 
     return (
       <View style={styles.container}>
-          <StatusBar backgroundColor='#009387' barStyle="light-content"/>
+        <StatusBar backgroundColor='#009387' barStyle="light-content"/>
         <View style={styles.header}>
             <Animatable.Image 
-                animation="bounceIn"
-                duraton="1500"
+            animation="bounceIn"
+            duraton="1500"
             source={require('../../assets/logo.png')}
             style={styles.logo}
             resizeMode="stretch"
             />
+             <ActivityIndicator size='large' color="#fff"></ActivityIndicator>
         </View>
-        <Animatable.View 
-            style={[styles.footer, {
-                backgroundColor: colors.background
-            }]}
-            animation="fadeInUpBig"
-        >
-            <Text style={[styles.title, {
-                color: colors.text
-            }]}>Stay connected with everyone!</Text>
-            <Text style={styles.text}>Sign in with account</Text>
-            <View style={styles.button}>
-            <TouchableOpacity onPress={()=>navigation.navigate('SignInScreen')}>
-                <LinearGradient
-                    colors={['#08d4c4', '#01ab9d']}
-                    style={styles.signIn}
-                >
-                    <Text style={styles.textSign}>Get Started</Text>
-                    <MaterialIcons 
-                        name="navigate-next"
-                        color="#fff"
-                        size={20}
-                    />
-                </LinearGradient>
-            </TouchableOpacity>
-            </View>
-        </Animatable.View>
+       
+       
       </View>
     );
 };

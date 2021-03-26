@@ -1,4 +1,17 @@
 export const NAVIGATION={
     "SEARCH":"search",
-    "PRODUCT_SCREEN":"product_screen"
+    "PRODUCT_SCREEN":"product_screen",
+    "LOCATION":"LOCATION",
+    "HOME":"HOME",
+    "PRODUCT_SEARCH_SCREEN":"PRODUCT_SEARCH_SCREEN",
+    "LOGIN":"LOGIN",
+    "HomeDrawer":"HomeDrawer",
+    "MYACCOUNT":"MYACCOUNT",
+    "BASKET":"BASKET",
+    "BASKET_TAB":"BASKET_TAB",
+    "ADDRESS" : "ADDRESS",
+    "NEW_ADDRESS":"NEW_ADDRESS",
+    "PAYMENT":"PAYMENT",
+    "ORDER_SUCCESS":"ORDER_SUCCESS",
+    "MYORDER":"MYORDER"
 }

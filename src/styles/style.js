@@ -1,4 +1,5 @@
 import { StyleSheet } from 'react-native';
+import { PRIMARY_COLOUR } from './colors';
 
 export const colors = {
     black: '#1a1917',
@@ -66,5 +67,26 @@ export default StyleSheet.create({
         height: 8,
         borderRadius: 4,
         marginHorizontal: 8
-    }
+    },
+    badge:{
+        position:'absolute',right:-10,top:-10,
+        backgroundColor:'red',color:'white',
+        width:20,
+        height:20,
+        borderRadius:20,
+        opacity:1,
+        justifyContent:'center',
+        alignItems: 'center',
+        textAlign:'center',
+        zIndex:2
+        
+        
+        },
+        button:{alignContent:'center',
+        backgroundColor:PRIMARY_COLOUR,
+        color:"white",
+        padding:5,
+        borderRadius:2
+    
+        }
 });

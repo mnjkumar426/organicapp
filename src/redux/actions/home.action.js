@@ -1,15 +1,33 @@
 
-import { getHomeDataSuccess } from '../reducers/home.data.reducer'
-import Api from '../../services/http.base';
+import { getHomeDataSuccess,getLocationSuccess } from '../reducers/home.data.reducer'
+import {API} from '../../services/http.base';
 export const getHomeData = () => async dispatch => {
   try {
-  let response=await Api.get('/wc/v3/products/categories');
-  let categories= response.data;
-  console.log("categories",categories)
+  let data=await API.get("/api/home_data");
+  
+  dispatch(getHomeDataSuccess(data))
   
   }
     
    catch (e) {
-    return console.error(e.message);
+     console.log(e.message);
   }
 }
+
+export const getLocation = () => async dispatch => {
+  try {
+  let data=await API.get("/api/location");
+  
+  dispatch(getLocationSuccess(data.location))
+  
+  }
+    
+   catch (e) {
+     console.log(e.message);
+  }
+}
+
+
+
+
+

@@ -17,14 +17,19 @@ import {
 } from '@react-navigation/drawer';
 
 import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import MIcon from 'react-native-vector-icons/Entypo';
 import {logout} from '../redux/actions/auth.action'
-import { useDispatch } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { NAVIGATION } from '../constants/navigation';
+import { IOCN_COLOR, LIGHT_COLOUR, PRIMARY_COLOUR, SECONDARY_BG } from '../styles/colors';
+import { TouchableOpacity } from 'react-native-gesture-handler';
+import Appstyle from '../styles/style'
 
 export function DrawerContent(props) {
 
     const paperTheme = useTheme();
     const dispatch = useDispatch()
+    const {defaultLocation,isLogin,user}=useSelector(state=>state.auth)
     
 
     return(
@@ -40,21 +45,31 @@ export function DrawerContent(props) {
                                 size={50}
                             />
                             <View style={{marginLeft:15, flexDirection:'column'}}>
-                                <Title style={styles.title}>John Doe</Title>
-                                <Caption style={styles.caption}>@j_doe</Caption>
+                            <Title style={styles.title}>{user?.name}</Title>
+                                
                             </View>
+                            {isLogin?null:
+                            <TouchableOpacity onPress={()=>{
+                                props.navigation.navigate(NAVIGATION.LOGIN)
+                            }}  >
+                                <Text style={
+                                   { ...Appstyle.button,
+                                    marginLeft:10,
+                                    marginTop:10
+                                   }
+                                   
+                                }>Login Now</Text>
+                            </TouchableOpacity>
+}
                         </View>
 
-                        <View style={styles.row}>
-                            <View style={styles.section}>
-                                <Paragraph style={[styles.paragraph, styles.caption]}>80</Paragraph>
-                                <Caption style={styles.caption}>Following</Caption>
-                            </View>
-                            <View style={styles.section}>
-                                <Paragraph style={[styles.paragraph, styles.caption]}>100</Paragraph>
-                                <Caption style={styles.caption}>Followers</Caption>
-                            </View>
-                        </View>
+                        <TouchableOpacity style={styles.row} 
+                         onPress={() => {props.navigation.navigate(NAVIGATION.LOCATION)}}
+                        >
+                        <MIcon name='location-pin'  size={25} color={IOCN_COLOR} />
+                            <Text style={{fontSize:18,padding:10}}>{defaultLocation?.title}</Text>
+                        <MIcon name="chevron-down" size={25} style={{paddingTop:10}} color={IOCN_COLOR}></MIcon>
+                        </TouchableOpacity>
                     </View>
 
                     <Drawer.Section style={styles.drawerSection}>
@@ -149,6 +164,11 @@ const styles = StyleSheet.create({
     },
     userInfoSection: {
       paddingLeft: 20,
+      borderBottomWidth:1,
+      borderBottomColor:"#ddd",
+      paddingBottom:20,
+      backgroundColor:LIGHT_COLOUR
+      
     },
     title: {
       fontSize: 16,
@@ -163,6 +183,7 @@ const styles = StyleSheet.create({
       marginTop: 20,
       flexDirection: 'row',
       alignItems: 'center',
+      
     },
     section: {
       flexDirection: 'row',
